@@ -16,6 +16,8 @@ library("readxl")
 library("bcmaps")
 library("bcdata")
 library("mapview")
+library(tidyverse)
+library(units)
 View(available_layers())
 BEC<-bec()
 mapview(BEC) 
@@ -31,6 +33,15 @@ LacDuBois <- protected_areas %>%
 mapview(LacDuBois)
 
 BEC_Inside_LacDuBois<- st_intersection(BEC, LacDuBois)
+
+## What you did above works, however it's a bit more concise to use the 
+## bcdc_query_geodata() function and then provide filters before downloading data; 
+## this prevents you needing to download the whole dataset to your PC as it will
+## do some filtering on their servers before it sends you the filtered dataset.
+
+#########
+## 4/4 ##
+#########
 
 mapview(BEC_Inside_LacDuBois)
 View(BEC_Inside_LacDuBois)
@@ -52,6 +63,9 @@ total_area_ha <- sum(BEC_Inside_LacDuBois$area_ha, na.rm = TRUE)
 print(paste("Total area in hectares:", total_area_ha))
 #"Total area in hectares: 15773.3785374985"
 
+#########
+## 2/2 ##
+#########
 
 
 ggplot(BEC_Inside_LacDuBois, aes(x = MAP_LABEL, y = area_ha, fill = MAP_LABEL)) +
@@ -60,9 +74,18 @@ ggplot(BEC_Inside_LacDuBois, aes(x = MAP_LABEL, y = area_ha, fill = MAP_LABEL)) 
   labs(x = "MAP_LABEL", y = "Area (ha)", title = "Area by MAP_LABEL in Lac Du Bois") +
   scale_fill_viridis_d()
 
+#########
+## 5/5 ##
+#########
+
 library(terra)
 dem_data <- cded_terra("BEC_Inside_LacDuBois")
 BEC_Inside_LacDuBois$mean_elevation <- exact_extract(dem_data, BEC_Inside_LacDuBois, fun = mean)
+
+#########
+## 4/4 ##
+#########
+
 library(mapview)
 library(viridis) # for a nice color palette
 map <- mapview(BEC_Inside_LacDuBois, zcol = 'ZONE', legend = TRUE)
@@ -70,12 +93,15 @@ map@map$colors <- viridis::viridis(length(unique(BEC_Inside_LacDuBois$ZONE)))
 View(map)
 map
 
+###########
+## 3.5/4 ##
+###########
+
+## Needed to use the subzone column to color by, not the zone column!
 
 
+## Total:
 
-
-
-
-
-
-
+#############
+## 16.5/17 ##
+#############
